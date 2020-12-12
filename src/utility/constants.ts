@@ -15,16 +15,6 @@ export enum LISTS {
     IGNORE = 'ignore'
 }
 
-export interface Portals {
-    guildId: string
-    prefix: string
-    checkChannelId: string
-    categoryIds: string[]
-    ignoreIds: string[]
-    botChannelIds: string[]
-    lastCheckedAt: Date
-}
-
 const EMBEDS = {
     INFO: description => ({ embed: { description, color: 'F8F8FF' } }),
     ERROR: description => ({ embed: { description, color: 'B00020' } }),
