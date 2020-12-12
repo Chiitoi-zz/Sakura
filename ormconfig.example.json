@@ -1,0 +1,14 @@
+{
+    "name": "default",
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "unknown",
+    "password": "unknown",
+    "database": "unknown",
+    "entities": [
+        "dist/entities/*.*"
+    ],
+    "logging": true,
+    "synchronize": false
+}
