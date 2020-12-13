@@ -1,22 +1,70 @@
-import { createConnection } from 'typeorm'
+import { Connection, createConnection, getConnectionOptions } from 'typeorm'
 import { Collection, Message, Snowflake } from 'discord.js'
-import { SakuraClient } from '../structures'
+import { Client } from 'pg'
+import { PostgresConnectionCredentialsOptions } from 'typeorm/driver/postgres/PostgresConnectionCredentialsOptions'
 
 const reInvite = /(?:https?:\/\/)?(?:\w+\.)?discord(?:(?:app)?\.com\/invite|\.gg)\/(?<code>[a-z0-9-]+)/gi
 const reject = (error): [undefined, any] => [undefined, error]
+let connection: Connection
 
 function resolve<T>(data: T): [T, undefined] {
     return [data, undefined]
 }
 
-export const connect = async (client: SakuraClient) => {
+const createDatabase = async ({ host, port, user, password, database }) => {
+    const pgClient = new Client({ host, port, user, password, database: 'postgres' })
+
+    try {
+        await pgClient.connect()
+    
+        const databaseResults = await pgClient.query('SELECT datname FROM pg_catalog.pg_database;')
+        const databaseNames = databaseResults.rows.map(row => row.datname)
+        const databaseExists = databaseNames.includes(database)
+
+        if (databaseExists)
+            return
+
+        await pgClient.query(`CREATE DATABASE "${ database }"`)
+        console.log(`${ databaseExists ? 'Found' : 'Created' } database with name '${ database}'.`)        
+    } catch (error) {
+        console.log(`Unable to create database:\n${ error.stack }`)
+    } finally {
+        await pgClient.end()
+    }
+    
+}
+
+export const connect = async () => {
+    if (connection)
+        return connection
+
+    const options = await getConnectionOptions() as PostgresConnectionCredentialsOptions
+    const { host, port, username, password, database } = options
+
+    if (!host || !port || !username || !password || !database) {
+        console.log('Something\'s missing from your ormconfig.json file.')
+        process.exit(1)  
+    }
+
     try {
         const now = Date.now()
-        await createConnection()
-        console.log(`[POSTGRES] Connected to PostrgreSQL database in ${ Date.now() - now } ms.`)
+        
+        connection = await createConnection()
+        
+        const table = await connection.query('SELECT * FROM information_schema.tables WHERE table_schema = \'public\' AND table_name = \'guild\'')
+
+        if (!table.length)
+            await connection.synchronize()
+
+        console.log(`Connected to PostgreSQL database '${ database }' in ${ Date.now() - now } ms.`)
+        return connection
     } catch (error) {
-        console.log(`[POSTGRES] Unable to connect to PostgreSQL database:\n${ error.stack }`)
-        process.exit(1)
+        const noDatabase = (error.code === '3D000')
+
+        if (noDatabase)
+            await createDatabase({ host, port, user: username, password, database })
+
+        return connect()
     }
 }
 

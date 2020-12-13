@@ -75,7 +75,7 @@ export default class SakuraClient extends AkairoClient {
         this.inhibitorHandler.loadAll()
         this.listenerHandler.loadAll()
 
-        await connect(this)
+        await connect()
         await this.portals.init()
     }
 

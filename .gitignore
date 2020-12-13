@@ -9,4 +9,5 @@ node_modules
 
 # Random
 .vscode
+assets
 ormconfig.json 

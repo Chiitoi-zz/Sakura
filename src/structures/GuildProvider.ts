@@ -1,16 +1,7 @@
 import { Collection, Guild } from 'discord.js'
 import { Guild as GuildEntity } from '../entities'
 import { SakuraClient } from '.'
-
-interface SakuraGuild {
-    guildId: string
-    prefix: string
-    checkChannelId: string
-    categoryIds: string[]
-    ignoreIds: string[]
-    botChannelIds: string[]
-    lastCheckedAt: Date 
-}
+import { SakuraGuild } from '../utility/constants'
 
 export default class GuildProvider {
     public items: Collection<string, SakuraGuild>
@@ -51,7 +42,7 @@ export default class GuildProvider {
 
         if (!guildSettings) {
             const newGuild = await GuildEntity.create({ guildId }).save() as SakuraGuild
-            this.items.set(guildId, guildSettings)
+            this.items.set(guildId, newGuild)
         }
 
         if (key && value) {

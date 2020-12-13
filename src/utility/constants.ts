@@ -1,4 +1,4 @@
-import { CategoryChannel, Snowflake, TextChannel } from 'discord.js'
+import { CategoryChannel, Guild, Snowflake, TextChannel, User } from 'discord.js'
 
 export enum GUILD {
     PREFIX = 'prefix',
@@ -6,7 +6,8 @@ export enum GUILD {
     CATEGORIES = 'categoryIds',
     IGNORE = 'ignoreIds',
     BOT_CHANNELS = 'botChannelIds',
-    LAST_INVITE_CHECK = 'lastCheckedAt'
+    LAST_INVITE_CHECK = 'lastCheckedAt',
+    IN_GUILD = 'inGuild'
 }
 
 export enum LISTS {
@@ -15,9 +16,29 @@ export enum LISTS {
     IGNORE = 'ignore'
 }
 
-const EMBEDS = {
+export interface SakuraGuild {
+    guildId: string
+    prefix: string
+    checkChannelId: string
+    categoryIds: string[]
+    ignoreIds: string[]
+    botChannelIds: string[]
+    lastCheckedAt: Date 
+    inGuild: boolean
+}
+
+export const EMBEDS = {
     INFO: description => ({ embed: { description, color: 'F8F8FF' } }),
     ERROR: description => ({ embed: { description, color: 'B00020' } }),
+    GUILD: (event: 'guildCreate' | 'guildDelete', guild: Guild, owner: User) => ({
+        embed: {
+            title: `${ event == 'guildCreate' ? 'Joined' : 'Left' } server!`,
+            color: `${ event == 'guildCreate' ? '00B020' : 'B00020' }`,
+            description: `**Server name:** ${ guild.name }\n**Server ID:** ${ guild.id }\n**Owner:** ${ owner.tag }\n**Owner ID:** ${ owner.id }`,
+            thumbnail: { url: guild.iconURL({ format: 'png', dynamic: true, size: 512 }) },
+            timestamp: Date.now()
+        }
+    }),
     SUCCESS: description => ({ embed: { description, color: '00B020' } })
 }
 
