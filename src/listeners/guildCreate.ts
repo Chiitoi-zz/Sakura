@@ -1,6 +1,6 @@
 import { Listener } from 'discord-akairo'
 import { Constants, Guild, TextChannel } from 'discord.js'
-import { EMBEDS, SakuraGuild } from '../utility/constants'
+import { EMBEDS, GUILD, SakuraGuild } from '../utility/constants'
 
 export default class GuildCreateListener extends Listener {
     public constructor() {
@@ -17,10 +17,12 @@ export default class GuildCreateListener extends Listener {
 
         if (!sakuraGuild)
             await this.client.portals.set(guild)
+        else
+            await this.client.portals.set(guild, GUILD.IN_GUILD, true)
 
         const logChannel = await this.client.channels.fetch(process.env.LOG_CHANNEL_ID) as TextChannel
 
-        if (!logChannel)
+        if (logChannel)
             logChannel.send(EMBEDS.GUILD(Constants.Events.GUILD_CREATE, guild, owner))
     }
 }

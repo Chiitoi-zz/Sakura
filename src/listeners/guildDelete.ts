@@ -11,18 +11,16 @@ export default class GuildCreateListener extends Listener {
     }
 
     public async exec(guild: Guild) {
-        const sakuraGuild = this.client.portals.get(guild) as SakuraGuild
-
-        if (!sakuraGuild)
-            return
-
-        await this.client.portals.set(guild, GUILD.IN_GUILD, false)
-
-        const logChannel = await this.client.channels.fetch(process.env.LOG_CHANNEL_ID) as TextChannel
         const { ownerID } = guild
         const owner = await this.client.users.fetch(ownerID)
+        const logChannel = await this.client.channels.fetch(process.env.LOG_CHANNEL_ID) as TextChannel
 
-        if (!logChannel)
+        if (logChannel)
             logChannel.send(EMBEDS.GUILD(Constants.Events.GUILD_DELETE, guild, owner))
+
+        const sakuraGuild = this.client.portals.get(guild) as SakuraGuild
+
+        if (sakuraGuild)
+            await this.client.portals.set(guild, GUILD.IN_GUILD, false)
     }
 }

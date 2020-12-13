@@ -45,7 +45,7 @@ export default class GuildProvider {
             this.items.set(guildId, newGuild)
         }
 
-        if (key && value) {
+        if (key) {
             guildSettings[key] = value
             this.items.set(guildId, guildSettings)
             await GuildEntity.update(guildId, { [key]: value })
