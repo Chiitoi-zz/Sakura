@@ -60,7 +60,7 @@ export const MESSAGES = {
             DESCRIPTION: 'Runs an invite check on provided categories.',
             USAGE: 'check'
         },
-        CHECKCHANNEL: {
+        CHECK_CHANNEL: {
             DESCRIPTION: 'Modifies the invite check channel.',
             USAGE: 'checkchannel [textChannel]'
         },
@@ -118,13 +118,13 @@ export const MESSAGES = {
         CHANNEL_PURGE: (list: LISTS) => EMBEDS.SUCCESS(`All channels have been removed from the ${ list } list.`),
         CHANNEL_REMOVED: (channel: TextChannel | CategoryChannel, list: LISTS) =>  EMBEDS.SUCCESS(`${ channel } was removed from the ${ list } list.`),
         CHANNEL_REPLACED: (channel: TextChannel | CategoryChannel, list: LISTS) =>  EMBEDS.SUCCESS(`${ channel } is now the only ${ (channel.type === 'text') ? 'channel' : 'category' } in the ${ list } list.`),
-        CHECKCHANNEL_CHANGED: (channel: TextChannel) => EMBEDS.SUCCESS(`Check channel set to ${ channel }.`),
-        CURRENT_CHECKCHANNEL: (checkChannelId: Snowflake) => EMBEDS.INFO(`Current check channel is <#${ checkChannelId }>.`),
+        CHECK_CHANNEL_CHANGED: (channel: TextChannel) => EMBEDS.SUCCESS(`Check channel set to ${ channel }.`),
+        CURRENT_CHECK_CHANNEL: (checkChannelId: Snowflake) => EMBEDS.INFO(`Current check channel is <#${ checkChannelId }>.`),
         CURRENT_PREFIX: (prefix: string) => EMBEDS.INFO(`Current prefix is \`${ prefix }\`.`),
         MAX_PORTALS: EMBEDS.INFO('Invites for this bot are currently closed. Please join the support server to see if other invite check bots are available!'),
         NO_CHANGE: (channel: TextChannel | CategoryChannel, verbText: 'is already' | 'is not') => EMBEDS.INFO(`${ (channel.type === 'text') ?  channel : `The "${ channel.name }" category` } ${ verbText } in the whitelist.`),
         NO_CATEGORIES: EMBEDS.INFO('No categories have been added. Please add some.'),
-        NO_CHECKCHANNEL: EMBEDS.INFO('No check channel has been set. Please set one.'),
+        NO_CHECK_CHANNEL: EMBEDS.INFO('No check channel has been set. Please set one.'),
         NO_MATCH: EMBEDS.INFO('No match found.'),
         PREFIX_CHANGED: (prefix: string) => EMBEDS.SUCCESS(`Prefix changed to \`${ prefix }\`.`),
         TOO_EARLY: (remainingTime: string) => EMBEDS.INFO(`Please wait ${ remainingTime } before running another invite check.`),
