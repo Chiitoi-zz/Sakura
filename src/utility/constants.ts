@@ -28,8 +28,17 @@ export interface SakuraGuild {
 }
 
 export const EMBEDS = {
-    INFO: description => ({ embed: { description, color: 'F8F8FF' } }),
-    ERROR: description => ({ embed: { description, color: 'B00020' } }),
+    CATEGORY: (categoryName: string, description?: string) => ({
+        embed: {
+            title: `The "${ categoryName }" category`,
+            color: 'F8F8FF',
+            description: description ?? 'No channels to check in this category.',
+            footer: { text: `Checked ${ description ? 8 : 0 } messages` },
+            timestamp: Date.now()
+        }
+    }),
+    INFO: (description: string) => ({ embed: { description, color: 'F8F8FF' } }),
+    ERROR: (description: string) => ({ embed: { description, color: 'B00020' } }),
     GUILD: (event: 'guildCreate' | 'guildDelete', guild: Guild, owner: User) => ({
         embed: {
             title: `${ event == 'guildCreate' ? 'Joined' : 'Left' } server!`,
@@ -39,7 +48,7 @@ export const EMBEDS = {
             timestamp: Date.now()
         }
     }),
-    SUCCESS: description => ({ embed: { description, color: '00B020' } })
+    SUCCESS: (description: string) => ({ embed: { description, color: '00B020' } })
 }
 
 // [] = Optional

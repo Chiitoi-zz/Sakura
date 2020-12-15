@@ -34,7 +34,7 @@ export default class SettingsCommand extends Command {
                 acc.bots.push(channel)
             return acc
         }, { checkChannel: null, categories: [],  ignore: [], bots: [] })
-        const availableIn = lastCheckedAt ? dayjs(lastCheckedAt).add(24, 'hour').get('ms') - Date.now() : null
+        const availableIn = lastCheckedAt ? dayjs(lastCheckedAt).add(1, 'day').diff(Date.now()) : null
         const embed = {
             title: `Portal settings for "${ guild.name }"`,
             color: 'F8F8FF',

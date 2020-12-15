@@ -4,11 +4,20 @@ import { Client } from 'pg'
 import { PostgresConnectionCredentialsOptions } from 'typeorm/driver/postgres/PostgresConnectionCredentialsOptions'
 
 const reInvite = /(?:https?:\/\/)?(?:\w+\.)?discord(?:(?:app)?\.com\/invite|\.gg)\/(?<code>[a-z0-9-]+)/gi
-const reject = (error): [undefined, any] => [undefined, error]
 let connection: Connection
 
-function resolve<T>(data: T): [T, undefined] {
+function resolve<T>(data: T) {
     return [data, undefined]
+}
+
+function reject(error) {
+    return [undefined, error]
+}
+
+export async function handle<T>(promise: Promise<T>) {
+    return promise
+        .then(resolve)
+        .catch(reject)
 }
 
 const createDatabase = async ({ host, port, user, password, database }) => {
@@ -68,12 +77,6 @@ export const connect = async () => {
     }
 }
 
-export async function handle<T>(promise: Promise<T>) {
-    return promise
-        .then(resolve)
-        .catch(reject)
-}
-
 export const extractCodes = (messages: Collection<string, Message>) => {
     const matches = messages.reduce((acc, message) => {
         const { content } = message
@@ -81,7 +84,7 @@ export const extractCodes = (messages: Collection<string, Message>) => {
 
         return [...acc, ...results]
     }, [])
-    const codes = matches.map(match => match[1])
+    const codes: string[] = matches.map(match => match[1])
     
     return codes
 }
