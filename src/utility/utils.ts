@@ -89,24 +89,27 @@ export const extractCodes = (messages: Collection<string, Message>) => {
     return codes
 }
 
-export const formatResults = (results: Collection<Snowflake, { code: string, valid: boolean }[]>) => {
-    let description = ''
+export const processResults = (results: Collection<Snowflake, { code: string, valid: boolean }[]>) => {
+    let bad = 0, description = '', total = 0
 
-    for (const { 0: channelId, 1: result } of results) {
-        const total = result.length
+    for (const [channelId, channelResult] of results) {
+        const resultCount = channelResult.length
 
-        if (!total) {
+        if (!channelResult.length) {
             description += `🔴<#${ channelId }> - 0 found\n`
             continue
         }
 
-        const bad = result.filter(r => !r.valid).length
+        const badCount = channelResult.filter(({ valid }) => !valid).length
+        total += resultCount
+        bad += badCount
 
-        if (bad)
-            description += `🔴<#${ channelId }> - ${ bad }/${ total } bad\n`
+
+        if (badCount)
+            description += `🔴<#${ channelId }> - ${ badCount }/${ resultCount } bad\n`
         else
-            description += `🟢<#${ channelId }> - ${ total }/${ total } good\n`
+            description += `🟢<#${ channelId }> - ${ resultCount }/${ resultCount } good\n`
     }
 
-    return description
+    return { bad, channels: results.size, description, good: total - bad, total }
 }

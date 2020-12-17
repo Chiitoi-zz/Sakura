@@ -16,6 +16,8 @@ declare module 'discord-akairo' {
         config: SakuraOptions
         portals: GuildProvider
         queue: PQueue
+        readonly priorityCount: number
+        currentPriority: number
     }
 }
 
@@ -28,6 +30,8 @@ export default class SakuraClient extends AkairoClient {
         interval: 5000,
         intervalCap: 1
     })
+    public readonly priorityCount = 1000
+    public currentPriority = this.priorityCount
     public commandHandler = new CommandHandler(this, {
         directory: join(__dirname, '..', 'commands'),
         prefix: (message: Message) => this.portals.get(message.guild, GUILD.PREFIX, process.env.DEFAULT_PREFIX) as string,

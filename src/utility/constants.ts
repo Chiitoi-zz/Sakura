@@ -48,6 +48,22 @@ export const EMBEDS = {
             timestamp: Date.now()
         }
     }),
+    RESULTS: (bad: number, channels: number, good: number, total: number) => ({
+        embed: {
+            title: 'Invite check results',
+            color: 'F8F8FF',
+            fields: [
+                { name: 'Check counts', value: [`Channels checked: ${ channels }`, `Invites checked: ${ total }`] },
+                {
+                    name: 'Stats',
+                    value: [
+                        `- ${ good }/${ total} good invites (${ (100 * good / total).toFixed(2) }% 🟢)`,
+                        `- ${ bad}/${ total} bad invites (${ (100 * bad / total).toFixed(2) }% 🔴)`,
+                    ]
+                }
+            ]
+        }
+    }),
     SUCCESS: (description: string) => ({ embed: { description, color: '00B020' } })
 }
 
@@ -127,6 +143,9 @@ export const MESSAGES = {
         CHANNEL_PURGE: (list: LISTS) => EMBEDS.SUCCESS(`All channels have been removed from the ${ list } list.`),
         CHANNEL_REMOVED: (channel: TextChannel | CategoryChannel, list: LISTS) =>  EMBEDS.SUCCESS(`${ channel } was removed from the ${ list } list.`),
         CHANNEL_REPLACED: (channel: TextChannel | CategoryChannel, list: LISTS) =>  EMBEDS.SUCCESS(`${ channel } is now the only ${ (channel.type === 'text') ? 'channel' : 'category' } in the ${ list } list.`),
+        CHECK_COMPLETE: EMBEDS.SUCCESS('Invite check complete!'),
+        CHECK_START: (botName: string) => EMBEDS.INFO(`An invite check is currently in progress. Please give ${ botName } a few hours to check your channels.`),
+        CHECK_WAIT: (remainingTime: string) => EMBEDS.INFO(`There are currently a few invite checks scheduled ahead of you. Your invite check will start in about ${ remainingTime }.`),
         CHECK_CHANNEL_CHANGED: (channel: TextChannel) => EMBEDS.SUCCESS(`Check channel set to ${ channel }.`),
         CURRENT_CHECK_CHANNEL: (checkChannelId: Snowflake) => EMBEDS.INFO(`Current check channel is <#${ checkChannelId }>.`),
         CURRENT_PREFIX: (prefix: string) => EMBEDS.INFO(`Current prefix is \`${ prefix }\`.`),
