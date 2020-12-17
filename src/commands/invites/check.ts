@@ -2,7 +2,7 @@ import { Command } from 'discord-akairo'
 import { CategoryChannel, Collection, Message, NewsChannel, Snowflake, TextChannel } from 'discord.js'
 import dayjs from 'dayjs'
 import pms from 'pretty-ms'
-import { EMBEDS, MESSAGES, SakuraGuild } from '../../utility/constants'
+import { GUILD, EMBEDS, MESSAGES, SakuraGuild } from '../../utility/constants'
 import { extractCodes, handle, processResults } from '../../utility/utils'
 
 export default class CheckCommand extends Command {
@@ -22,9 +22,11 @@ export default class CheckCommand extends Command {
     public async exec(message: Message) {
         const guild = message.guild!
         const commandChannelId = message.channel.id
-        const { checkChannelId, categoryIds, ignoreIds, lastCheckedAt } = this.client.portals.get(guild) as SakuraGuild
+        const { checkChannelId, categoryIds, ignoreIds, lastCheckedAt, inCheck } = this.client.portals.get(guild) as SakuraGuild
         const availableIn = lastCheckedAt ? dayjs(lastCheckedAt).add(1, 'day').diff(Date.now()) : null
 
+        if (inCheck)
+            return message.util.send(MESSAGES.STATES.IN_CHECK)
         if (availableIn > 0)
             return message.util.send(MESSAGES.STATES.TOO_EARLY(pms(availableIn, { secondsDecimalDigits: 0 })))
 
@@ -53,6 +55,8 @@ export default class CheckCommand extends Command {
         const botName = this.client.user.username
         const queueSize = this.client.queue.size
 
+        await this.client.portals.set(guild, GUILD.IN_CHECK, true)
+
         if (queueSize) {
             checkChannel.send(MESSAGES.STATES.CHECK_WAIT(pms(timeToCheck, { secondsDecimalDigits: 0 })))
         } else
@@ -60,7 +64,7 @@ export default class CheckCommand extends Command {
 
         let goodInvites = 0, badInvites = 0, totalChannels = 0, totalInvites = 0
 
-        for (const [_,category] of categoriesSorted) {
+        for (const [_, category] of categoriesSorted) {
             const categoryName = category.name
             const childChannels = category.children
                 .filter(<(channel) => channel is NewsChannel | TextChannel>(channel => !ignoreIds.includes(channel.id))) as Collection<string, NewsChannel | TextChannel>
@@ -105,6 +109,7 @@ export default class CheckCommand extends Command {
         }
 
         checkChannel.send(MESSAGES.STATES.CHECK_COMPLETE)
-        checkChannel.send(EMBEDS.RESULTS(badInvites, totalChannels, goodInvites, totalInvites))        
+        checkChannel.send(EMBEDS.RESULTS(badInvites, totalChannels, goodInvites, totalInvites))
+        await this.client.portals.set(guild, GUILD.IN_CHECK, false)      
     }
 }

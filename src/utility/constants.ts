@@ -7,7 +7,8 @@ export enum GUILD {
     IGNORE = 'ignoreIds',
     BOT_CHANNELS = 'botChannelIds',
     LAST_INVITE_CHECK = 'lastCheckedAt',
-    IN_GUILD = 'inGuild'
+    IN_GUILD = 'inGuild',
+    IN_CHECK = 'inCheck'
 }
 
 export enum LISTS {
@@ -25,6 +26,7 @@ export interface SakuraGuild {
     botChannelIds: string[]
     lastCheckedAt: Date 
     inGuild: boolean
+    inCheck: boolean
 }
 
 export const EMBEDS = {
@@ -149,6 +151,7 @@ export const MESSAGES = {
         CHECK_CHANNEL_CHANGED: (channel: TextChannel) => EMBEDS.SUCCESS(`Check channel set to ${ channel }.`),
         CURRENT_CHECK_CHANNEL: (checkChannelId: Snowflake) => EMBEDS.INFO(`Current check channel is <#${ checkChannelId }>.`),
         CURRENT_PREFIX: (prefix: string) => EMBEDS.INFO(`Current prefix is \`${ prefix }\`.`),
+        IN_CHECK: EMBEDS.INFO('You already have an invite check in progress. Please wait until at least 24 hours after your current invite check ends before running another one.'),
         MAX_PORTALS: EMBEDS.INFO('Invites for this bot are currently closed. Please join the support server to see if other invite check bots are available!'),
         NO_CHANGE: (channel: TextChannel | CategoryChannel, verbText: 'is already' | 'is not') => EMBEDS.INFO(`${ (channel.type === 'text') ?  channel : `The "${ channel.name }" category` } ${ verbText } in the whitelist.`),
         NO_CATEGORIES: EMBEDS.INFO('No categories have been added. Please add some.'),

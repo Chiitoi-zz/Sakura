@@ -26,6 +26,9 @@ export default class Guild extends BaseEntity {
     @Column({ type: 'boolean', default: true, comment: 'Flag to see if Sakura is in guild'})
     inGuild!: boolean
 
+    @Column({ type: 'boolean', default: false, comment: 'Flag to see if an invite check is in progress'})
+    inCheck!: boolean
+
     @CreateDateColumn({ type: 'timestamptz', comment: 'Timestamp when bot was added' })
     createdAt!: Date
 
