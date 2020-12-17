@@ -110,6 +110,7 @@ export default class CheckCommand extends Command {
 
         checkChannel.send(MESSAGES.STATES.CHECK_COMPLETE)
         checkChannel.send(EMBEDS.RESULTS(badInvites, totalChannels, goodInvites, totalInvites))
+        await this.client.portals.set(guild, GUILD.LAST_INVITE_CHECK, new Date)
         await this.client.portals.set(guild, GUILD.IN_CHECK, false)      
     }
 }
