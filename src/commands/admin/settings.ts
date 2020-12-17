@@ -22,7 +22,7 @@ export default class SettingsCommand extends Command {
         const guild = message.guild!
         const guildChannels = guild.channels.cache
             .sort((c1, c2) => c1.position - c2.position)
-        const { prefix, checkChannelId, categoryIds, ignoreIds, botChannelIds, lastCheckedAt } = this.client.portals.get(guild) as SakuraGuild
+        const { prefix, checkChannelId, categoryIds, ignoreIds, botChannelIds, lastCheckedAt, inCheck } = this.client.portals.get(guild) as SakuraGuild
         const { checkChannel, categories, ignore, bots } = guildChannels.reduce((acc, channel, channelId) => {
             if (checkChannelId == channelId)
                 acc.checkChannel = channel
@@ -44,7 +44,7 @@ export default class SettingsCommand extends Command {
                 { name: 'Category list', value: categories.length ? categories.map(({ name }) => `The "${ name }" category`) : 'No added categories.' },
                 { name: 'Ignore list', value: ignore.length ? ignore : 'No ignored channels.' },
                 { name: 'Bot channel list', value: bots.length ? bots : 'No added bot channels.' },
-                { name: 'Time until next invite check', value: (availableIn > 0) ? pms(availableIn, { secondsDecimalDigits: 0 }) : '**READY TO CHECK!**' }
+                { name: 'Time until next invite check', value: (availableIn > 0) ? pms(availableIn, { secondsDecimalDigits: 0 }) : `**${ inCheck ? 'CURRENTLY CHECKING' : 'READY TO CHECK!' }**` }
             ]
         }
 
