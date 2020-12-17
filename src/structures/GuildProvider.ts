@@ -1,7 +1,7 @@
 import { Collection, Guild } from 'discord.js'
 import { Guild as GuildEntity } from '../entities'
 import { SakuraClient } from '.'
-import { SakuraGuild } from '../utility/constants'
+import { GUILD, SakuraGuild } from '../utility/constants'
 
 export default class GuildProvider {
     public items: Collection<string, SakuraGuild>
@@ -11,7 +11,7 @@ export default class GuildProvider {
     }
 
     public async init() {
-        await GuildEntity.query('UPDATE guild SET "inCheck" = FALSE;')
+        await GuildEntity.query('UPDATE guild SET "inCheck" = FALSE, priority = NULL;')
         const guilds = await GuildEntity.find() as SakuraGuild[]
 
         for (const guild of guilds)
@@ -53,7 +53,27 @@ export default class GuildProvider {
         }
     }
 
-    private resetCheckStatus() {
-        
+    public async startInviteCheck(guild: string | Guild, priority: number) {
+        const guildId = this.getGuildId(guild)
+        const guildSettings = this.items.get(guildId)
+
+        guildSettings[GUILD.IN_CHECK] = true
+        guildSettings[GUILD.PRIORITY] = priority
+
+        this.items.set(guildId, guildSettings)
+        await GuildEntity.update(guildId, { [GUILD.IN_CHECK]: true, [GUILD.PRIORITY]: priority })
+    }
+
+    public async endInviteCheck(guild: string | Guild) {
+        const guildId = this.getGuildId(guild)
+        const guildSettings = this.items.get(guildId)
+        const now = new Date
+
+        guildSettings[GUILD.LAST_INVITE_CHECK] = now
+        guildSettings[GUILD.IN_CHECK] = false
+        guildSettings[GUILD.PRIORITY] = null
+
+        this.items.set(guildId, guildSettings)
+        await GuildEntity.update(guildId, { [GUILD.LAST_INVITE_CHECK]: now, [GUILD.IN_CHECK]: false, [GUILD.PRIORITY]: null })
     }
 }

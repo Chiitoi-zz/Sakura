@@ -49,13 +49,12 @@ export default class CheckCommand extends Command {
         const inviteTask = (code: string) => () => handle(this.client.fetchInvite(code))
 
         const priority = this.client.currentPriority
-        this.client.currentPriority -= 1       
-
+        this.client.currentPriority -= 1    
         const timeToCheck = (this.client.queue.size * 5000) + 900000
         const botName = this.client.user.username
         const queueSize = this.client.queue.size
 
-        await this.client.portals.set(guild, GUILD.IN_CHECK, true)
+        await this.client.portals.startInviteCheck(guild, priority)  
 
         if (queueSize) {
             checkChannel.send(MESSAGES.STATES.CHECK_WAIT(pms(timeToCheck, { secondsDecimalDigits: 0 })))
@@ -110,7 +109,6 @@ export default class CheckCommand extends Command {
 
         checkChannel.send(MESSAGES.STATES.CHECK_COMPLETE)
         checkChannel.send(EMBEDS.RESULTS(badInvites, totalChannels, goodInvites, totalInvites))
-        await this.client.portals.set(guild, GUILD.LAST_INVITE_CHECK, new Date)
-        await this.client.portals.set(guild, GUILD.IN_CHECK, false)      
+        await this.client.portals.endInviteCheck(guild)    
     }
 }

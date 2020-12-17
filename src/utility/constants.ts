@@ -7,6 +7,7 @@ export enum GUILD {
     IGNORE = 'ignoreIds',
     BOT_CHANNELS = 'botChannelIds',
     LAST_INVITE_CHECK = 'lastCheckedAt',
+    PRIORITY = 'priority',
     IN_GUILD = 'inGuild',
     IN_CHECK = 'inCheck'
 }
@@ -25,6 +26,7 @@ export interface SakuraGuild {
     ignoreIds: string[]
     botChannelIds: string[]
     lastCheckedAt: Date 
+    priority: number
     inGuild: boolean
     inCheck: boolean
 }
@@ -126,6 +128,10 @@ export const MESSAGES = {
             DESCRIPTION: 'Displays a guild\'s current settings.',
             USAGE: 'settings'
         },
+        STATE: {
+            DESCRIPTION: 'Displays status of invite check.',
+            USAGE: 'state'
+        },
         STATS: {
             DESCRIPTION: 'Displays bot information.',
             USAGE: 'stats'
@@ -147,11 +153,14 @@ export const MESSAGES = {
         CHANNEL_REPLACED: (channel: TextChannel | CategoryChannel, list: LISTS) =>  EMBEDS.SUCCESS(`${ channel } is now the only ${ (channel.type === 'text') ? 'channel' : 'category' } in the ${ list } list.`),
         CHECK_COMPLETE: EMBEDS.SUCCESS('Invite check complete!'),
         CHECK_START: (botName: string) => EMBEDS.INFO(`An invite check is currently in progress. Please give ${ botName } a few hours to check your channels.`),
-        CHECK_WAIT: (remainingTime: string) => EMBEDS.INFO(`There are currently a few invite checks scheduled ahead of you. Your invite check will start in about ${ remainingTime }.`),
+        CHECK_STATUS_1: (otherTime: string, myTime: string) => EMBEDS.INFO(`Your invite check will begin in about ${ otherTime } and may take about ${ myTime }.`),
+        CHECK_STATUS_2: (myTime: string) => EMBEDS.INFO(`Your invite check will take ${ myTime } to complete.`),
+        CHECK_WAIT: (remainingTime: string) => EMBEDS.INFO(`There are currently a few invite checks scheduled ahead of you. Your invite check will be queued and start in about ${ remainingTime }.`),
         CHECK_CHANNEL_CHANGED: (channel: TextChannel) => EMBEDS.SUCCESS(`Check channel set to ${ channel }.`),
         CURRENT_CHECK_CHANNEL: (checkChannelId: Snowflake) => EMBEDS.INFO(`Current check channel is <#${ checkChannelId }>.`),
         CURRENT_PREFIX: (prefix: string) => EMBEDS.INFO(`Current prefix is \`${ prefix }\`.`),
         IN_CHECK: EMBEDS.INFO('You already have an invite check in progress. Please wait until at least 24 hours after your current invite check ends before running another one.'),
+        NO_CHECK: EMBEDS.INFO('You do not have an invite check in progress.'),
         MAX_PORTALS: EMBEDS.INFO('Invites for this bot are currently closed. Please join the support server to see if other invite check bots are available!'),
         NO_CHANGE: (channel: TextChannel | CategoryChannel, verbText: 'is already' | 'is not') => EMBEDS.INFO(`${ (channel.type === 'text') ?  channel : `The "${ channel.name }" category` } ${ verbText } in the whitelist.`),
         NO_CATEGORIES: EMBEDS.INFO('No categories have been added. Please add some.'),
