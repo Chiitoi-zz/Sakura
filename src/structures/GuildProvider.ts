@@ -11,6 +11,7 @@ export default class GuildProvider {
     }
 
     public async init() {
+        await GuildEntity.query('UPDATE guild SET "inCheck" = FALSE;')
         const guilds = await GuildEntity.find() as SakuraGuild[]
 
         for (const guild of guilds)
@@ -50,5 +51,9 @@ export default class GuildProvider {
             this.items.set(guildId, guildSettings)
             await GuildEntity.update(guildId, { [key]: value })
         }
+    }
+
+    private resetCheckStatus() {
+        
     }
 }
