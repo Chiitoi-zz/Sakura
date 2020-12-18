@@ -1,7 +1,9 @@
 import { Connection, createConnection, getConnectionOptions } from 'typeorm'
-import { Collection, Message, Snowflake } from 'discord.js'
+import { AkairoClient } from 'discord-akairo'
+import { CategoryChannel, Collection, Message, Snowflake, TextChannel } from 'discord.js'
 import { Client } from 'pg'
 import { PostgresConnectionCredentialsOptions } from 'typeorm/driver/postgres/PostgresConnectionCredentialsOptions'
+import { GUILD, LISTS, MESSAGES } from './constants'
 
 const reInvite = /(?:https?:\/\/)?(?:\w+\.)?discord(?:(?:app)?\.com\/invite|\.gg)\/(?<code>[a-z0-9-]+)/gi
 let connection: Connection
@@ -112,4 +114,36 @@ export const processResults = (results: Collection<Snowflake, { code: string, va
     }
 
     return { bad, channels: results.size, description, good: total - bad, total }
+}
+
+export const updateList = async (client: AkairoClient, message: Message, guildKey: 'categoryIds' | 'botChannelIds' | 'ignoreIds', guildList: LISTS, action: 'add' | 'remove' | 'replace', channel: TextChannel | CategoryChannel) => {
+    if (!action)
+        return message.util.send(MESSAGES.ERRORS.INVALID_ACTION)
+    if (!channel && ['add', 'remove'].includes(action))
+        return message.util.send(MESSAGES.ERRORS.INVALID_CHANNEL(channel.type))
+
+    const channelId = channel?.id
+    const list = client.portals.get(message.guild, guildKey, []) as string[]
+    const inList = list.includes(channelId)
+
+    if (action == 'add' && !inList) {
+        const newList = [...list, channelId]
+        await client.portals.set(message.guild, guildKey, newList)
+        return message.util.send(MESSAGES.STATES.CHANNEL_ADDED(channel, guildList))
+    } else if (action == 'remove' && inList) {
+        const newList = list.filter(c => c != channelId)
+        await client.portals.set(message.guild, guildKey, newList)
+        return message.util.send(MESSAGES.STATES.CHANNEL_REMOVED(channel, guildList))
+    } else if (action == 'replace') {
+        if (channelId) {
+            await client.portals.set(message.guild, guildKey, [channelId])
+            return message.util.send(MESSAGES.STATES.CHANNEL_REPLACED(channel, guildList))
+        } else {
+            await client.portals.set(message.guild, guildKey, [])
+            return message.util.send(MESSAGES.STATES.CHANNEL_PURGE(guildList))
+        }
+    } else {
+        const verbText = (action == 'add') ? 'is already' : 'is not'
+        return message.util.send(MESSAGES.STATES.NO_CHANGE(channel, verbText))
+    }  
 }
