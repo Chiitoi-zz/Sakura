@@ -20,7 +20,7 @@ export default class StatsCommand extends Command {
         const formatNumber = (num: number | string) => num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
         const embed = {
             author: {
-                name: `${ this.client.user.username} v${ process.env.npm_package_version }`,
+                name: `${ this.client.user.username} v${ process.env.npm_package_version ?? process.env.version }`,
                 icon_url: this.client.user.displayAvatarURL()
             },
             color: 'F8F8FF',
