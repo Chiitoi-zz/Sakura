@@ -11,8 +11,7 @@ export default class SupportCommand extends Command {
             description: {
                 text: MESSAGES.COMMANDS.SUPPORT.DESCRIPTION,
                 usage: MESSAGES.COMMANDS.SUPPORT.USAGE
-            },
-
+            }
         })
     }
 
