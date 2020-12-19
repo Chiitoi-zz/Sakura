@@ -27,7 +27,7 @@ export default class HelpCommand extends Command {
     }
 
     public async exec(message: Message, { query }: { query: Command | Category<string, Command> | Collection<string, Category<string, Command>> | null }) {
-        const prefix = this.client.portals.get(message.guild, GUILD.PREFIX, process.env.DEFAULT_PREFIX)
+        const prefix = this.client.portals.get(message.guild, GUILD.PREFIX, process.env.DEFAULT_PREFIX) as string
 
         if (!query)
             return message.util.send(MESSAGES.STATES.NO_MATCH)
