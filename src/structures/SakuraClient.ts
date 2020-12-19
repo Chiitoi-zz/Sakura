@@ -34,7 +34,7 @@ export default class SakuraClient extends AkairoClient {
     public currentPriority = this.priorityCount
     public commandHandler = new CommandHandler(this, {
         directory: join(__dirname, '..', 'commands'),
-        prefix: (message: Message) => this.portals.get(message.guild, GUILD.PREFIX, process.env.DEFAULT_PREFIX) as string,
+        prefix: (message: Message) => this.portals.get(message.guild, GUILD.PREFIX, '!!') as string,
         aliasReplacement: /-/g,
         allowMention: true,
         commandUtil: true,
