@@ -11,7 +11,7 @@ export default class ReadyListener extends Listener {
 
     public async exec() {
         const totalGuilds = this.client.guilds.cache.size
-        await this.client.user.setActivity('@Sakura gen2', { type: 'LISTENING' })
+        await this.client.user.setActivity('@Sakura guide', { type: 'LISTENING' })
         console.log(`${ this.client.user.tag } is online!`)
         console.log(`${ this.client.user.username } is in ${ totalGuilds } guilds(s)!`)
     }
