@@ -31,9 +31,7 @@ export default class StatsCommand extends Command {
                     name: 'General stuff',
                     value: [
                         `**Portals:** ${ formatNumber(this.client.guilds.cache.size) }`,
-                        `**Channels:** ${ formatNumber(this.client.channels.cache.size) }`,
-                        `**Members:** ${ formatNumber(this.client.users.cache.size) }`,
-                        `**Emojis:** ${ formatNumber(this.client.emojis.cache.size) }`
+                        `**Channels:** ${ formatNumber(this.client.channels.cache.size) }`
                     ]
                 },
                 {
