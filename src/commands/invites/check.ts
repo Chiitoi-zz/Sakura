@@ -66,7 +66,7 @@ export default class CheckCommand extends Command {
         for (const [_, category] of categoriesSorted) {
             const categoryName = category.name
             const childChannels = category.children
-                .filter(<(channel) => channel is NewsChannel | TextChannel>(channel => !ignoreIds.includes(channel.id))) as Collection<string, NewsChannel | TextChannel>
+                .filter(<(channel) => channel is NewsChannel | TextChannel>(channel => ['news', 'text'].includes(channel.type) && !ignoreIds.includes(channel.id))) as Collection<string, NewsChannel | TextChannel>
 
             if (!childChannels.size) {
                 message.util.send(EMBEDS.CATEGORY(categoryName))
