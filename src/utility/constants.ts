@@ -32,15 +32,20 @@ export interface SakuraGuild {
 }
 
 export const EMBEDS = {
-    CATEGORY: (categoryName: string, description?: string) => ({
-        embed: {
+    CATEGORY: (categoryName: string, resultsDescription?: string, issuesDescription?: string[]) => {
+        const embed: any = {
             title: `The "${ categoryName }" category`,
             color: 'F8F8FF',
-            description: description ?? 'No channels to check in this category.',
-            footer: { text: `Checked ${ description ? 8 : 0 } messages` },
+            description: resultsDescription ?? 'No channels to check in this category.',
+            footer: { text: `Checked ${ resultsDescription ? 8 : 0 } messages` },
             timestamp: Date.now()
         }
-    }),
+
+        if (issuesDescription?.length)
+            embed!.fields = [{ name: 'Issues', value: issuesDescription }]
+
+        return { embed }
+    },
     INFO: (description: string) => ({ embed: { description, color: 'F8F8FF' } }),
     ERROR: (description: string) => ({ embed: { description, color: 'B00020' } }),
     GUILD: (event: 'guildCreate' | 'guildDelete', guild: Guild, owner: User) => ({

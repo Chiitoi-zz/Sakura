@@ -45,7 +45,7 @@ export default class CheckCommand extends Command {
         const categoriesSorted = categories.sort((c1, c2) => c1.position - c2.position)
         const delay = ms => new Promise(res => setTimeout(res, ms))
         const delayTask = () => delay(5000)
-        const messagesTask = (channel: NewsChannel | TextChannel) => () => channel.messages.fetch({ limit: 8 }, true, false)
+        const messagesTask = (channel: NewsChannel | TextChannel) => () => handle(channel.messages.fetch({ limit: 8 }, true, false))
         const inviteTask = (code: string) => () => handle(this.client.fetchInvite(code))
 
         const priority = this.client.currentPriority
@@ -74,14 +74,24 @@ export default class CheckCommand extends Command {
             }
 
             const categoryResults: Collection<Snowflake, { code: string, valid: boolean }[]> = new Collection()
+            const issues: { unknown: number, known: (NewsChannel | TextChannel)[] } = { unknown: 0, known: [] }
             const childChannelsSorted = childChannels.sort((c1, c2) => c1.position - c2.position)
 
             for (const [channelId, channel] of childChannelsSorted) {
-                const messages = await this.client.queue.add(messagesTask(channel), { priority })
+                if (!channel) {
+                    issues.unknown++
+                    continue
+                }
 
+                const messages = await this.client.queue.add(messagesTask(channel), { priority })
                 this.client.queue.add(delayTask, { priority })
 
-                const codes = extractCodes(messages)
+                if (!messages[0]) {
+                    issues.known.push(channel)
+                    continue
+                }            
+
+                const codes = extractCodes(messages[0])
 
                 if (!codes.length) {
                     categoryResults.set(channelId, [])
@@ -99,12 +109,12 @@ export default class CheckCommand extends Command {
                 categoryResults.set(channelId, results)
             }
 
-            const { bad, channels, description, good, total } = processResults(categoryResults)
+            const { bad, channels, good, issuesDescription, resultsDescription, total } = processResults(categoryResults, issues)
             badInvites += bad
             totalChannels += channels
             goodInvites += good
             totalInvites += total
-            checkChannel.send(EMBEDS.CATEGORY(categoryName, description))
+            checkChannel.send(EMBEDS.CATEGORY(categoryName, resultsDescription, issuesDescription))
         }
 
         checkChannel.send(MESSAGES.STATES.CHECK_COMPLETE)

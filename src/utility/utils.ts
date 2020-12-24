@@ -1,6 +1,6 @@
 import { Connection, createConnection, getConnectionOptions } from 'typeorm'
 import { AkairoClient } from 'discord-akairo'
-import { CategoryChannel, Collection, Message, Snowflake, TextChannel } from 'discord.js'
+import { CategoryChannel, Collection, Message, NewsChannel, Snowflake, TextChannel } from 'discord.js'
 import { Client } from 'pg'
 import { PostgresConnectionCredentialsOptions } from 'typeorm/driver/postgres/PostgresConnectionCredentialsOptions'
 import { GUILD, LISTS, MESSAGES } from './constants'
@@ -8,11 +8,11 @@ import { GUILD, LISTS, MESSAGES } from './constants'
 const reInvite = /(?:https?:\/\/)?(?:\w+\.)?discord(?:(?:app)?\.com\/invite|\.gg)\/(?<code>[a-z0-9-]+)/gi
 let connection: Connection
 
-function resolve<T>(data: T) {
+function resolve<T>(data: T): [T, undefined] {
     return [data, undefined]
 }
 
-function reject(error) {
+function reject(error): [undefined, any] {
     return [undefined, error]
 }
 
@@ -91,14 +91,14 @@ export const extractCodes = (messages: Collection<string, Message>) => {
     return codes
 }
 
-export const processResults = (results: Collection<Snowflake, { code: string, valid: boolean }[]>) => {
-    let bad = 0, description = '', total = 0
+export const processResults = (results: Collection<Snowflake, { code: string, valid: boolean }[]>, issues: { unknown: number, known: (NewsChannel | TextChannel)[] }) => {
+    let bad = 0, issuesDescription: string[] = [], resultsDescription = '', total = 0
 
     for (const [channelId, channelResult] of results) {
         const resultCount = channelResult.length
 
         if (!channelResult.length) {
-            description += `🔴<#${ channelId }> - 0 found\n`
+            resultsDescription += `🔴<#${ channelId }> - 0 found\n`
             continue
         }
 
@@ -106,14 +106,20 @@ export const processResults = (results: Collection<Snowflake, { code: string, va
         total += resultCount
         bad += badCount
 
-
         if (badCount)
-            description += `🔴<#${ channelId }> - ${ badCount }/${ resultCount } bad\n`
+            resultsDescription += `🔴<#${ channelId }> - ${ badCount }/${ resultCount } bad\n`
         else
-            description += `🟢<#${ channelId }> - ${ resultCount }/${ resultCount } good\n`
+            resultsDescription += `🟢<#${ channelId }> - ${ resultCount }/${ resultCount } good\n`
     }
 
-    return { bad, channels: results.size, description, good: total - bad, total }
+    if (issues.unknown)
+        issuesDescription.push(`- ${ issues.unknown } channel(s) could not be checked.`)
+    if (issues.known.length) {
+        const channelDescription = issues.known.map(channel => `<#${ channel.id }>`).join(', ')
+        issuesDescription.push(`- The following need manual checks: ${ channelDescription }`)
+    }
+
+    return { bad, channels: results.size, good: total - bad, issuesDescription, resultsDescription, total }
 }
 
 export const updateList = async (client: AkairoClient, message: Message, guildKey: 'categoryIds' | 'botChannelIds' | 'ignoreIds', guildList: LISTS, action: 'add' | 'remove' | 'replace', channel: TextChannel | CategoryChannel) => {
