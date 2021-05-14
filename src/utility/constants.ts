@@ -98,6 +98,10 @@ export const MESSAGES = {
             DESCRIPTION: 'Modifies the invite check channel.',
             USAGE: 'checkchannel [textChannel]'
         },
+        COUNTS: {
+            DESCRIPTION: 'Displays channel counts (by type) for added categories.',
+            USAGE: 'counts'
+        },
         IDS: {
             DESCRIPTION: 'Displays a list of all category IDs in a server.',
             USAGE: 'ids'
