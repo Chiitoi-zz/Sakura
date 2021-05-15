@@ -27,7 +27,7 @@ export default class SakuraClient extends AkairoClient {
     public queue = new PQueue({
         autoStart: true,
         concurrency: 1,
-        interval: 5000,
+        interval: +(process.env.INTERVAL || 5000),
         intervalCap: 1
     })
     public readonly priorityCount = 1000
