@@ -25,6 +25,6 @@
     "pg": "^8.6.0",
     "pretty-ms": "^7.0.1",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.32"
+    "typeorm": "^0.3.14"
   }
 }
